@@ -1,0 +1,10 @@
+{% extends "MainBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/main/js/failed-event.js') }}"></script>
+{% endblock %}

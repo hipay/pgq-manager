@@ -1,0 +1,20 @@
+{% extends 'MainBundle::layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/authentication/css/login.css') }}"
+{% endblock %}
+
+    {% block title "Symfony - Demos" %}
+
+        {% block content_header '' %}
+
+            {% block content %}
+                <h1>Welcome to the config form!</h1>
+
+                <h3>Databases <input type="submit" class="btn btn-success" value="Save" onclick="$('form[name=settings]').submit()"></h3>
+                <div class="row-fluid">
+                    {{ form(form, {style:'horizontal', 'method': 'POST'}) }}
+                </div>
+
+            {% endblock %}

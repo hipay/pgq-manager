@@ -1,0 +1,53 @@
+{% extends 'MainBundle::layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/authentication/css/login.css') }}"
+{% endblock %}
+
+{% block content %}
+    <div class="presentation text-center">
+        <span class="title">PGQManager</span>
+    </div>
+    <div class="row-fluid">
+        <div class="col-md-offset-4 col-md-4">
+            <h1>Login</h1>
+
+            <p>
+                {% trans %}Please use your Google account credentials{% endtrans %}
+            </p>
+
+            <form class="form-horizontal" action="{{ path("_security_check") }}" method="post" id="login">
+
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.message }}</div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="username" class="col-sm-2 control-label">{% trans %}Username{% endtrans %}</label>
+
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="username" name="_username"
+                               value="{{ last_username }}" placeholder="Username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="col-sm-2 control-label">{% trans %}Password{% endtrans %}</label>
+
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="password" name="_password"
+                               placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input type="submit" class="btn btn-default" value="{% trans %}Sign in{% endtrans %}">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
