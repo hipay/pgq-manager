@@ -1,0 +1,12 @@
+config:
+    resource: "@ConfigBundle/Resources/config/routing.yml"
+    prefix:   /
+
+authentication:
+    resource: "@AuthenticationBundle/Resources/config/routing.yml"
+
+main:
+    resource: "@MainBundle/Resources/config/routing.yml"
+
+fos_js_routing:
+     resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"

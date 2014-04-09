@@ -1,0 +1,21 @@
+parameters:
+#    config.example.class: PgqManager\ConfigBundle\Example
+      pgq_config_bundle.configurator.class: PgqManager\ConfigBundle\Configurator\Configurator
+
+services:
+#    config.example:
+#        class: %config.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
+      kernel.listener.config_route:
+          class: PgqManager\ConfigBundle\Listener\ConfigRouteListener
+          tags:
+              - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+          arguments: [ @security.context, @doctrine.orm.entity_manager, @router ]
+
+      pgq_config_bundle.configurator:
+          class: %pgq_config_bundle.configurator.class%
+          arguments: [ %kernel.cache_dir%]
+
+      pgq_config_bundle.switch_db:
+          class: PgqManager\ConfigBundle\Service\SwitchDatabaseConnection
+          arguments: [ @doctrine, @doctrine.dbal.connection_factory ]

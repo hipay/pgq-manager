@@ -1,0 +1,142 @@
+/********************************
+              MAIN
+*********************************/
+html, body {
+    height: 100%;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+div.header {
+    position: fixed;
+    height: 50px;
+    z-index: 100;
+    width: 100%;
+    background-color: #2f2f2f;
+    padding: 8px;
+    color: #ffffff;
+}
+
+div.page {
+    padding-top: 50px;
+    height: 100%;
+}
+
+table > caption {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px;
+}
+/********************************
+           HEADER NAV
+*********************************/
+div.header nav.top-menu span + a {
+    margin-left: 20px;
+}
+
+/********************************
+           SIDEBAR LEFT
+*********************************/
+div.sidebar-left {
+    height: 100%;
+    background-color: blue;
+    padding: 20px 0 0 0;
+    position: fixed;
+    width: 300px;
+    left: 0;
+    z-index: 100;
+}
+
+div.sidebar-left form.navbar-form * {
+    border-radius: 0;
+}
+
+div.sidebar-left ul.menu {
+    background-color: red;
+    font-size: 25px;
+    margin-top: 20px;
+}
+
+div.sidebar-left ul.menu .glyphicon {
+    font-size: 20px;
+}
+
+div.sidebar-left ul.menu li {
+    padding: 15px
+}
+
+div.sidebar-left ul.menu > li {
+    padding-left: 30px;
+    border-bottom: solid 1px #2f2f2f;
+}
+
+div.sidebar-left ul.menu > li:first-child {
+    border-top: solid 1px #2f2f2f;
+}
+
+div.sidebar-left ul.menu > ul.sub-menu {
+    background-color: green;
+    font-size: 15px;
+}
+
+div.sidebar-left ul.menu > ul.sub-menu > li {
+    margin-left: 60px;
+}
+
+/********************************
+           SIDEBAR RIGHT
+*********************************/
+div.sidebar-right {
+    height: 100%;
+    background-color: blue;
+    padding: 20px 0 0 0;
+    position: fixed;
+    width: 0;
+    right: 0;
+    overflow: hidden;
+    z-index: 100;
+}
+
+/********************************
+           MAIN CONTENT
+*********************************/
+div.main-content {
+    padding-left: 350px;
+}
+
+.bc-collection .thumbnail {
+    padding: 22px;
+}
+
+div.row.table {
+    margin-top: 20px;
+    border: 1px solid black;
+    box-shadow: 8px 8px 0 #CCC;
+    padding: 20px;
+}
+
+tr[data-clickable=true] {
+    cursor: pointer;
+}
+
+/********************************
+           Datatable
+*********************************/
+.datatable tr.even.active, .datatable tr.odd.active {
+    background-color: #FFF8E3;
+}
+
+.datatable tr.even.active td.sorting_1, .datatable tr.odd.active td.sorting_1 {
+    background-color: #FFF1CC;
+}
+
+.datatable td a + a {
+    margin-left: 10px;
+}

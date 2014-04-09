@@ -1,0 +1,3 @@
+_config_home:
+    pattern:  /config
+    defaults: { _controller: ConfigBundle:Default:index }

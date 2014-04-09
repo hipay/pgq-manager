@@ -1,0 +1,91 @@
+{% extends "MainBundle:FailedEvent:failedEvent.html.twig" %}
+
+    {% block subTitle %}
+        {% trans %}Failed Events{% endtrans %}
+    {% endblock %}
+
+        {% block content_header '' %}
+
+            {% block content %}
+                {% if app.request.get('id') %}
+                    {% set dbId = app.request.get('id') %}
+                    <h1 class="text-center">{{ dbId|databaseInfos.displayName }}</h1>
+                {% endif %}
+
+                {% for id, failedDatabase in failedDatabases %}
+                    <div name="table-{{ id }}" class="row table">
+                        <div class="col-md-12">
+                            <table class="datatable{% if failedDatabase.error is defined %} alert alert-danger{% endif %}">
+                                <caption
+                                        class="hero-unit{% if failedDatabase.error is defined %} alert-danger{% endif %}">
+                                    {{ id|databaseInfos.displayName }}
+                                    {% if failedDatabase.error is defined %}
+                                        <span data-toggle="tooltip" data-placement="top"
+                                              title="{{ id|databaseInfos.name ~ ' : ' ~ failedDatabase.error }}"
+                                              class="glyphicon glyphicon-info-sign"></span>
+                                    {% endif %}
+                                </caption>
+                                <thead>
+                                <tr>
+                                    <th>{% trans %}Queue{% endtrans %}</th>
+                                    <th>{% trans %}Consumer{% endtrans %}</th>
+                                    <th>{% trans %}Failed Events{% endtrans %}</th>
+                                    <th>{% trans %}Last Failure{% endtrans %}</th>
+                                    <th>{% trans %}Last Event Id{% endtrans %}</th>
+                                    {% if app.request.get('id') %}
+                                        <th></th>
+                                    {% endif %}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% if not failedDatabase.error is defined %}
+                                    {% for row in failedDatabase %}
+
+                                        <tr>
+                                            <td>{{ row.queue_name }}</td>
+                                            <td>{{ row.consumer_name }}</td>
+                                            <td>{{ row.failed_events }}</td>
+                                            <td>{{ row.last_failure }}</td>
+                                            <td>{{ row.last_event_id }}</td>
+                                            {% if app.request.get('id') %}
+                                                <td>
+                                                    <a class="datatable-action" href="">
+                                                        <span class="glyphicon glyphicon-search"></span>
+                                                    </a>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% if dbId is defined %}
+                    <div name="table-event-{{ dbId }}" class="row table" style="display: none">
+                        <div class="col-md-12">
+                            <table data-uri="{{ path('_main_failedevent_listajax') }}"
+                                   class="ajax datatable">
+                                <caption>
+                                    {% trans %}Failed Events{% endtrans %}
+                                </caption>
+                                <thead>
+                                <tr>
+                                    <th>{% trans %}ID{% endtrans %}</th>
+                                    <th>{% trans %}Failed Time{% endtrans %}</th>
+                                    <th>{% trans %}Creation Time{% endtrans %}</th>
+                                    <th>{% trans %}Retry{% endtrans %}</th>
+                                    <th>{% trans %}Type{% endtrans %}</th>
+                                    <th>{% trans %}Actions{% endtrans %}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+
+            {% endblock %}

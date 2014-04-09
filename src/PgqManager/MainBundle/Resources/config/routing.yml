@@ -1,0 +1,49 @@
+homepage:
+    pattern:  /
+    defaults: { _controller: MainBundle:Default:index }
+
+_main_dashboard:
+    pattern: /dashboard
+    defaults: { _controller: MainBundle:Dashboard:index, id: null}
+
+_main_dashboard_filtered:
+    pattern: /dashboard/database/{id}
+    defaults: { _controller: MainBundle:Dashboard:index, id: null}
+
+_main_failedevent_list:
+    pattern: /failed-event/database/{id}
+    defaults: { _controller: MainBundle:FailedEvent:index, id: null}
+
+_main_failedevent_list_filtered:
+    pattern: /failed-event/database/{id}
+    defaults: { _controller: MainBundle:FailedEvent:index, id: null}
+
+_main_failedevent_listajax:
+    pattern: /failed-event/listAjax
+    defaults: { _controller: MainBundle:FailedEvent:listAjax }
+    requirements:
+        _method:  POST
+
+_main_default_queueinfo:
+    pattern: /queue-info
+    defaults: { _controller: MainBundle:Default:queueInfo }
+    requirements:
+        _method:  POST
+    options:
+        expose: true
+
+_main_default_consumerinfo:
+    pattern: /consumer-info
+    defaults: { _controller: MainBundle:Default:consumerInfo }
+    requirements:
+        _method:  POST
+    options:
+        expose: true
+
+_main_failedevent_action:
+    pattern: /failed-event/action
+    defaults: { _controller: MainBundle:FailedEvent:do }
+    requirements:
+        _method:  POST
+    options:
+            expose: true

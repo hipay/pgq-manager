@@ -1,0 +1,7 @@
+parameters:
+#    authentication.example.class: PgqManager\AuthenticationBundle\Example
+
+services:
+#    authentication.example:
+#        class: %authentication.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
