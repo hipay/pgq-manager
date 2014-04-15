@@ -53,7 +53,7 @@ class PGQ
     public function searchFailedEvent($criteria)
     {
         $result = array();
-        $select = array('ev_id', 'ev_failed_time', 'ev_time', 'ev_retry', 'ev_type', 'ev_data', "'' as action");
+        $select = array('ev_id', 'ev_failed_time', 'ev_time', 'ev_retry', 'ev_type', 'ev_data', 'ev_failed_reason', "'' as action");
 
         $sqlbody = " FROM pgq.failed_queue fq, pgq.consumer,"
             . " pgq.queue, pgq.subscription"
