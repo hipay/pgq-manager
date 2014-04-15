@@ -14,62 +14,14 @@ $(document).ready(function () {
     $(div).prependTo('div.main-content').delay(2000).fadeOut(400, function () {
       $(this).remove()
     });
-  }
-
-  $('#queueFilter').on('change', function () {
-    var qfilter = $(this).val();
-    options.sort(function (a, b) {
-      return $(b).val() - $(a).val();
-    });
-    $('#consumerFilter').append(options);
-    options = [];
-
-    if (qfilter != -1) {
-      var filteredOptions = $('#consumerFilter').find(':not([value^="' + qfilter + '"], [value=-1])');
-
-      $.each(filteredOptions, function () {
-        options.push($(this).clone());
-        $(this).remove();
-      });
-
-      $.ajax({
-        url: Routing.generate('_main_default_queueinfo'),
-        type: "POST",
-        data: 'id=' + qfilter,
-        dataType: 'json',
-        success: function (json) {
-          $('div.sidebar-right > #queueInfo > div.content').text(json);
-          $('div.sidebar-right').animate({width: "+20%"}, 800);
-          console.log(json);
-        }
-      });
-    }
-
-  });
-
-  $('#consumerFilter').on('change', function () {
-    var cfilter = $(this).val();
-
-    if (cfilter != -1) {
-
-      $.ajax({
-        url: Routing.generate('_main_default_consumerinfo'),
-        type: "POST",
-        data: 'id=' + cfilter,
-        dataType: 'json',
-        success: function (json) {
-          $('div.sidebar-right > #consumerInfo > div.content').text(json);
-          console.log(json);
-        }
-      });
-    }
-
-  });
+  };
 
   function fnFormatDetails(nTr) {
     var aData = datatable.fnGetData(nTr);
-    var sOut = '<table style="padding-left:50px;background-color: navajowhite; word-break: break-all">';
-    sOut += '<tr data-clickable="false"><td>' + aData['ev_data'] + '</td></tr>';
+    var sOut = '<table style="padding-left:50px; word-break: break-all">';
+    sOut += '<tr data-clickable="false" class="alert-info"><td>' + aData['ev_data'] + '</td></tr>';
+    if (aData['ev_failed_reason'] && aData['ev_failed_reason'] != '')
+      sOut += '<tr data-clickable="false" class="alert-danger"><td>' + aData['ev_failed_reason'] + '</td></tr>';
     sOut += '</table>';
 
     return sOut;
