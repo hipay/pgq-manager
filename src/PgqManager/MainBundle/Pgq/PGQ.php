@@ -71,6 +71,10 @@ class PGQ
                 . ")";
         }
 
+        if (isset($criteria['event_id'])) {
+            $sqlbody .= " AND ev_id = " . $criteria['event_id'];
+        }
+
         if (isset($criteria['sort'])) {
             $sqlorder =
                 ' ORDER BY ' . $criteria['sort'];
@@ -110,7 +114,7 @@ class PGQ
      */
     public function getQueueInfo($qname = null)
     {
-        $sql = 'select * from pgq.get_queue_info(' . ($qname ? "'" . $qname . "'" : '') . ')';
+        $sql = 'select * from pgq . get_queue_info(' . ($qname ? "'" . $qname . "'" : '') . ')';
         $return = array();
 
         $result = $this->dbal->executeQuery($sql)->fetchAll();
@@ -133,7 +137,7 @@ class PGQ
      */
     public function getFailedQueueInfo($qname = null, $cname = null, $onlyFailed = false)
     {
-        $stmt = $this->dbal->executeQuery('select * from pgq.get_failed_queue_info('
+        $stmt = $this->dbal->executeQuery('select * from pgq . get_failed_queue_info('
             . ($qname ? '"' . $qname . '"' : '')
             . ($cname ? ', "' . $cname . '"' : '')
             . ')'
@@ -147,9 +151,9 @@ class PGQ
     {
         $stmt = $this->dbal->executeQuery(
             'SELECT * '
-            . 'FROM pgq.get_failed_queue_info() a    '
-            . 'JOIN pgq.get_queue_info() b USING (queue_name) '
-            . ($qname ? 'WHERE a.queue_name = "' . $qname . '"' : '')
+            . 'FROM pgq . get_failed_queue_info() a    '
+            . 'JOIN pgq . get_queue_info() b USING(queue_name) '
+            . ($qname ? 'WHERE a . queue_name = "' . $qname . '"' : '')
         );
 
         return $stmt;
@@ -164,7 +168,7 @@ class PGQ
      */
     public function getConsumerInfo($qname = null, $cname = null)
     {
-        $sql = 'select * from pgq.get_consumer_info('
+        $sql = 'select * from pgq . get_consumer_info('
             . ($qname ? "'" . $qname . "'" : '')
             . ($cname ? ", '" . $cname . "'" : '')
             . ')';

@@ -7,7 +7,10 @@
 
 namespace PgqManager\MainBundle\Entity;
 
-
+/**
+ * Class Queue
+ * @package PgqManager\MainBundle\Entity
+ */
 class Queue
 {
     /**

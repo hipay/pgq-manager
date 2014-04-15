@@ -1,5 +1,20 @@
 {% extends "MainBundle:FailedEvent:failedEvent.html.twig" %}
 
+{% block beforeJavascript %}
+    {% if (app.request.get('id') is defined and filter.queue is defined and filter.consumer is defined ) %}
+        <script>
+            var customSearchData = [
+                { name: 'database', value: {{ app.request.get('id') | databaseInfos.id }} },
+                { name: 'queue', value: "{{ filter.queue }}" },
+                { name: 'consumer', value: "{{ filter.consumer }}" }
+                {% if filter.event is defined %}
+                    , { name: 'eventid', value: {{ filter.event }} }
+                {% endif %}
+            ];
+        </script>
+    {% endif %}
+{% endblock %}
+
     {% block subTitle %}
         {% trans %}Failed Events{% endtrans %}
     {% endblock %}
@@ -8,7 +23,7 @@
 
             {% block content %}
                 {% if app.request.get('id') %}
-                    {% set dbId = app.request.get('id') %}
+                    {% set dbId = app.request.get('id')|databaseInfos.id %}
                     <h1 class="text-center">{{ dbId|databaseInfos.displayName }}</h1>
                 {% endif %}
 

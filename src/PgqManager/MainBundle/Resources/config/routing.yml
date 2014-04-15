@@ -7,22 +7,18 @@ _main_dashboard:
     defaults: { _controller: MainBundle:Dashboard:index, id: null}
 
 _main_dashboard_filtered:
-    pattern: /dashboard/database/{id}
+    pattern: /dashboard/{id}
     defaults: { _controller: MainBundle:Dashboard:index, id: null}
-
-_main_failedevent_list:
-    pattern: /failed-event/database/{id}
-    defaults: { _controller: MainBundle:FailedEvent:index, id: null}
-
-_main_failedevent_list_filtered:
-    pattern: /failed-event/database/{id}
-    defaults: { _controller: MainBundle:FailedEvent:index, id: null}
 
 _main_failedevent_listajax:
     pattern: /failed-event/listAjax
     defaults: { _controller: MainBundle:FailedEvent:listAjax }
     requirements:
         _method:  POST
+
+_main_failedevent_list:
+    pattern: /failed-event/database/{id}/{queue}/{consumer}/{event}
+    defaults: { _controller: MainBundle:FailedEvent:index, id: null, queue: null, consumer: null, event: null}
 
 _main_default_queueinfo:
     pattern: /queue-info

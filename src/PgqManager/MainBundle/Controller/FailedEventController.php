@@ -22,10 +22,16 @@ class FailedEventController extends Controller
      * @param int $id
      * @return array
      */
-    public function indexAction($id = null)
+    public function indexAction($id = null, $queue = null, $consumer = null, $event = null)
     {
         $switchDbService = $this->container->get('pgq_config_bundle.switch_db');
-        $dbIds = $switchDbService->getAllDatabaseIds();
+        if ($id && !is_numeric($id)) {
+            $id = $switchDbService->getDatabase(array(
+                'name' => $id,
+                'uid'  => $this->get('security.context')->getToken()->getUsername()
+            ))->getId();
+        }
+        $dbIds = $switchDbService->getAllDatabaseIds($this->get('security.context')->getToken()->getUsername());
         $pgq = new PGQ();
         $consumers = array();
         $queues = array();
@@ -49,11 +55,22 @@ class FailedEventController extends Controller
             }
         }
 
-        return array(
+        $result = array(
             'dbqueues'        => $queues,
             'dbconsumers'     => $consumers,
             'failedDatabases' => $failedDatabases
         );
+
+        if ($queue && $consumer) {
+            $result['filter'] = array(
+                'queue'    => $queue,
+                'consumer' => $consumer
+            );
+            if($event) {
+                $result['filter']['event'] = $event;
+            }
+        }
+        return $result;
     }
 
     public function listAjaxAction()
@@ -78,6 +95,11 @@ class FailedEventController extends Controller
 
             $criteria['queue'] = $this->get('request')->get('queue');
             $criteria['consumer'] = $this->get('request')->get('consumer');
+
+            // eventid specified?
+            if ($this->get('request')->get('eventid')) {
+                $criteria['event_id'] = $this->get('request')->get('eventid');
+            }
 
             // search parameter
             if ($this->get('request')->get('sSearch')) {

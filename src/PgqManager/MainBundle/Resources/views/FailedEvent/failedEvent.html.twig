@@ -6,5 +6,7 @@
 
 {% block javascripts %}
     {{ parent() }}
+    {% block beforeJavascript %}
+    {% endblock %}
     <script src="{{ asset('bundles/main/js/failed-event.js') }}"></script>
 {% endblock %}

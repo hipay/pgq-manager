@@ -84,7 +84,7 @@
                             {% if ConfigDatabases is defined and ConfigDatabases|length > 0 %}
                                 {% for database in ConfigDatabases %}
                                     <li>
-                                        <a href="{{ path('_main_failedevent_list_filtered', {'id': database.id}) }}">{{ database.displayName }}</a>
+                                        <a href="{{ path('_main_failedevent_list', {'id': database.id}) }}">{{ database.displayName }}</a>
                                     </li>
                                 {% endfor %}
                             {% else %}

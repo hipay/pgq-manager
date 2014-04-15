@@ -34,6 +34,13 @@ table > caption {
     font-weight: bold;
     padding: 5px;
 }
+
+.alert {
+    border-radius: 0;
+}
+
+
+
 /********************************
            HEADER NAV
 *********************************/
@@ -46,7 +53,7 @@ div.header nav.top-menu span + a {
 *********************************/
 div.sidebar-left {
     height: 100%;
-    background-color: blue;
+    background-color: #37B3DC;
     padding: 20px 0 0 0;
     position: fixed;
     width: 300px;
@@ -59,7 +66,7 @@ div.sidebar-left form.navbar-form * {
 }
 
 div.sidebar-left ul.menu {
-    background-color: red;
+    background-color: #008ab8;
     font-size: 25px;
     margin-top: 20px;
 }
@@ -74,20 +81,20 @@ div.sidebar-left ul.menu li {
 
 div.sidebar-left ul.menu > li {
     padding-left: 30px;
-    border-bottom: solid 1px #2f2f2f;
-}
-
-div.sidebar-left ul.menu > li:first-child {
-    border-top: solid 1px #2f2f2f;
 }
 
 div.sidebar-left ul.menu > ul.sub-menu {
-    background-color: green;
+    background-color: #63BDDC;
     font-size: 15px;
 }
 
 div.sidebar-left ul.menu > ul.sub-menu > li {
     margin-left: 60px;
+}
+
+div.sidebar-left ul a {
+    /*color: #EC5800;*/
+    color: white;
 }
 
 /********************************
@@ -120,6 +127,16 @@ div.row.table {
     border: 1px solid black;
     box-shadow: 8px 8px 0 #CCC;
     padding: 20px;
+}
+
+div.row.table.alert.alert-danger {
+    box-shadow: 8px 8px 0 #ebccd1;
+    border-color: #994250;
+}
+
+div.row.table.alert.alert-success {
+    box-shadow: 8px 8px 0 #d6e9c6;
+    border-color: #689740;
 }
 
 tr[data-clickable=true] {
