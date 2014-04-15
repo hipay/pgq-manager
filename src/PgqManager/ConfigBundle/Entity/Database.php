@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class Database
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="PgqManager\ConfigBundle\Repository\DatabaseRepository")
  * @ORM\Table(name="pgqm_database")
  * @package PgqManager\ConfigBundle\Entity
  */

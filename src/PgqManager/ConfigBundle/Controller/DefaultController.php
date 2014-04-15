@@ -2,8 +2,6 @@
 
 namespace PgqManager\ConfigBundle\Controller;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use PgqManager\ConfigBundle\Entity\Database;
 use PgqManager\ConfigBundle\Entity\Settings;
 use PgqManager\ConfigBundle\Form\Type\SettingsType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

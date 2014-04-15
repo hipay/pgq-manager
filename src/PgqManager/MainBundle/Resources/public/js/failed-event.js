@@ -7,7 +7,7 @@ $(document).ready(function () {
 
   var flashmessage = function (sMessage, sClass) {
 
-    var div = $('<div class="alert alert-' + sClass + ' alert-dismissable">'
+    var div = $('<div class="row table alert alert-' + sClass + '">'
       + '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'
       + '<strong>' + sClass.toUpperCase() + '!</strong> ' + sMessage
       + '</div>');
@@ -75,7 +75,6 @@ $(document).ready(function () {
     return sOut;
   }
 
-  var customSearchData = new Array();
   var datatable = $('table.ajax.datatable').dataTable({
     "bProcessing": true,
     "bServerSide": true,
@@ -87,6 +86,8 @@ $(document).ready(function () {
 
       $.each(customSearchData, function (index, item) {
         aoData.push({ "name": item.name, "value": item.value });
+        if (item.name == 'eventid')
+          customSearchData.splice(index, 1);
       });
 
       $.ajax({
@@ -98,7 +99,6 @@ $(document).ready(function () {
           $this.parents('div[name^="table-event-"]').fadeIn();
 
           fnCallback(json);
-          refresh();
         }
       });
 
@@ -112,17 +112,26 @@ $(document).ready(function () {
       { "mData": "action", "bSortable": false }
     ],
     "aaSorting": [
-      [ 2, "desc" ]
+      [ 1, "desc" ]
     ],
     "fnRowCallback": function (nRow, aData, iDisplayIndex) {
       /* Append the grade to the default row class name */
       var td =
-        '<a class="table-event-action" href="#" data-action="retry"><span class="glyphicon glyphicon-refresh"></span></a>'
-          + '<a class="table-event-action" href="#" data-action="edit"><span class="glyphicon glyphicon-pencil"></span></a>'
-          + '<a class="table-event-action" href="#" data-action="delete"><span class="glyphicon glyphicon-remove"></span></a>';
+        '<a class="table-event-action" href="#" data-action="retry">'
+          + '  <span title="Retry" class="glyphicon glyphicon-refresh"></span>'
+          + '</a>'
+          + '<a class="table-event-action" href="#" data-action="edit">'
+          + '  <span title="Edit" class="glyphicon glyphicon-pencil"></span>'
+          + '</a>'
+          + '<a class="table-event-action" href="#" data-action="delete">'
+          + '  <span title="Delete" class="glyphicon glyphicon-remove"></span>'
+          + '</a>';
 
-      $(nRow).attr('data-clickable', 'true');
+      $(nRow).attr('data-clickable', 'true').attr('name', 'event-' + $(nRow).find('td:first-child').text());
       $(nRow).find('td:last-child').html($(td));
+      $(nRow).find('td:last-child span').tooltip({
+        placement: 'top'
+      });
     }
   })
     .on('click', 'tbody > tr[data-clickable=true]', function (e) {
@@ -170,13 +179,32 @@ $(document).ready(function () {
     customSearchData.push({name: 'consumer', value: $(this).parents('tr').find('td').eq(1).text()});
     $(this).parents('tbody').find('tr').removeClass('active');
     $(this).parents('tr').addClass('active');
+    window.clearInterval(refresh);
     datatable.fnFilter('');
+    startRefresh();
 
     return false;
   });
 
-  var refresh = function() {
-    datatable.fnDrawCallback();
-    setTimeout(refresh, 3000);
+  var refresh;
+  var startRefresh = function () {
+    refresh = setInterval(function () {
+      datatable.fnDraw();
+    }, 30000);
+  };
+
+  if (window.customSearchData == undefined) {
+    var customSearchData = new Array();
+
+  } else {
+    var customSearchData = window.customSearchData;
+    var eventFilter = '';
+
+    $.each(customSearchData, function (index, item) {
+      if (item.name == 'eventid')
+        eventFilter = item.value;
+    });
+    datatable.fnFilter(eventFilter);
   }
+
 });

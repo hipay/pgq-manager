@@ -18,4 +18,4 @@ services:
 
       pgq_config_bundle.switch_db:
           class: PgqManager\ConfigBundle\Service\SwitchDatabaseConnection
-          arguments: [ @doctrine, @doctrine.dbal.connection_factory ]
+          arguments: [ @doctrine, @doctrine.dbal.connection_factory, @security.context ]

@@ -8,12 +8,15 @@
 namespace PgqManager\ConfigBundle\Entity;
 
 
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use PgqManager\ConfigBundle\Repository\SettingsRepository;
 
 /**
  * Class Settings
+ *
  * @ORM\Entity
  * @ORM\Table(name="pgqm_settings")
  * @package PgqManager\ConfigBundle\Entity

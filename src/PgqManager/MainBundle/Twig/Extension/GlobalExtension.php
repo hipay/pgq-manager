@@ -53,9 +53,18 @@ class GlobalExtension extends \Twig_Extension
 
     public function databaseInfos($id)
     {
+        foreach ($this->databases as $database) {
 
-        return $this->em->getRepository('ConfigBundle:Database')->find($id);
+            if (!is_numeric($id) && $database->getName() == $id) {
+                return $database;
+            }
 
+            if ($database->getId() == $id) {
+                return $database;
+            }
+        }
+
+        return null;
     }
 
     /**

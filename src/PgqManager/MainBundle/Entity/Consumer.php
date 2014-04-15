@@ -7,7 +7,10 @@
 
 namespace PgqManager\MainBundle\Entity;
 
-
+/**
+ * Class Consumer
+ * @package PgqManager\MainBundle\Entity
+ */
 class Consumer
 {
     /**
