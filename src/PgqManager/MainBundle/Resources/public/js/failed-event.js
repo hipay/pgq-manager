@@ -5,6 +5,21 @@ $(document).ready(function () {
 
   var options = [];
 
+  var parseQueryString = function (queryString) {
+    var params = {}, queries, temp, i, l;
+
+    // Split into key/value pairs
+    queries = queryString.split("&");
+
+    // Convert the array of strings into an object
+    for (i = 0, l = queries.length; i < l; i++) {
+      temp = queries[i].split('=');
+      params[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1]);
+    }
+
+    return params;
+  };
+
   var flashmessage = function (sMessage, sClass) {
 
     var div = $('<div class="row table alert alert-' + sClass + '">'
@@ -19,9 +34,9 @@ $(document).ready(function () {
   function fnFormatDetails(nTr) {
     var aData = datatable.fnGetData(nTr);
     var sOut = '<table style="padding-left:50px; word-break: break-all">';
-    sOut += '<tr data-clickable="false" class="alert-info"><td>' + aData['ev_data'] + '</td></tr>';
+    sOut += '<tr name="data" data-clickable="false" class="alert-info"><td>' + aData['ev_data'] + '</td></tr>';
     if (aData['ev_failed_reason'] && aData['ev_failed_reason'] != '')
-      sOut += '<tr data-clickable="false" class="alert-danger"><td>' + aData['ev_failed_reason'] + '</td></tr>';
+      sOut += '<tr name="reason" data-clickable="false" class="alert-danger"><td>' + aData['ev_failed_reason'] + '</td></tr>';
     sOut += '</table>';
 
     return sOut;
@@ -122,6 +137,9 @@ $(document).ready(function () {
       });
 
       return false;
+    })
+    .on('mouseenter', 'tr[name=data]', function (e) {
+        console.log(parseQueryString($(this).text()));
     });
 
   $('.datatable-action').on('click', function () {

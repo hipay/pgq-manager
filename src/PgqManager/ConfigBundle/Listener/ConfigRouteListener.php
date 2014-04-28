@@ -9,6 +9,7 @@ namespace PgqManager\ConfigBundle\Listener;
 
 
 use Doctrine\ORM\EntityManager;
+use PgqManager\ConfigBundle\Service\DatabaseManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -17,16 +18,26 @@ use Symfony\Component\Security\Core\SecurityContext;
 
 class ConfigRouteListener
 {
+    /**
+     * @var DatabaseManager
+     */
+    private $dm;
 
-    private $em;
+    /**
+     * @var \Symfony\Component\Routing\Router
+     */
     private $router;
+
+    /**
+     * @var \Symfony\Component\Security\Core\SecurityContext
+     */
     private $security;
 
-    public function __construct(SecurityContext $security, EntityManager $em, Router $router)
+    public function __construct(SecurityContext $security, DatabaseManager $dm, Router $router)
     {
         $this->security = $security;
         $this->router = $router;
-        $this->em = $em;
+        $this->dm = $dm;
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -39,11 +50,7 @@ class ConfigRouteListener
             return;
         }
 
-        $settings = $this->em->getRepository('ConfigBundle:Settings')->findBy(array(
-            'uid' => $this->security->getToken()->getUsername()
-        ));
-
-        if (!$settings) {
+        if (!$this->dm->hasDatabases()) {
             $url = $this->router->generate('_config_home');
             $event->setResponse(new RedirectResponse($url));
         }

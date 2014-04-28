@@ -23,6 +23,22 @@ class Configuration implements ConfigurationInterface
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
+        $rootNode
+            ->children()
+                ->arrayNode('databases')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('display_name')->end()
+                            ->scalarNode('driver')->end()
+                            ->scalarNode('host')->end()
+                            ->scalarNode('port')->end()
+                            ->scalarNode('name')->end()
+                            ->scalarNode('user')->end()
+                            ->scalarNode('password')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

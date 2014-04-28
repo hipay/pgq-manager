@@ -20,9 +20,9 @@ class SwitchDatabaseConnection extends ContainerAware
 {
 
     /**
-     * @var \Doctrine\Bundle\DoctrineBundle\Registry
+     * @var DatabaseManager
      */
-    private $doctrine;
+    private $dm;
 
     /**
      * @var \Doctrine\Bundle\DoctrineBundle\ConnectionFactory
@@ -38,34 +38,10 @@ class SwitchDatabaseConnection extends ContainerAware
      * @param Registry $doctrine
      * @param ConnectionFactory $dbFactory
      */
-    public function __construct(Registry $doctrine, ConnectionFactory $dbFactory, SecurityContext $context)
+    public function __construct(DatabaseManager $dm, ConnectionFactory $dbFactory)
     {
-        $this->doctrine = $doctrine;
+        $this->dm = $dm;
         $this->dbFactory = $dbFactory;
-        $this->settings = $this->doctrine->getRepository('ConfigBundle:Settings')->findOneBy(
-            array(
-                'uid' => $context->getToken()->getUsername()
-            )
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function getAllDatabaseIds($uid)
-    {
-        $databases = $this->doctrine->getRepository('ConfigBundle:Database')->findBy(
-            array(
-                'settings' => $this->settings
-            )
-        );
-        $return = array();
-
-        foreach ($databases as $db) {
-            $return[] = $db->getId();
-        }
-
-        return $return;
     }
 
     /**
@@ -74,12 +50,7 @@ class SwitchDatabaseConnection extends ContainerAware
      */
     public function getDatabaseConnection($dbid)
     {
-        $database = $this->doctrine->getRepository('ConfigBundle:Database')->findOneBy(
-            array(
-                'settings' => $this->settings,
-                'id'       => $dbid
-            )
-        );
+        $database = $this->dm->getDatabase(array('id' => $dbid));
 
         return $this->dbFactory->createConnection(array(
             'driver'   => $database->getDriver(),

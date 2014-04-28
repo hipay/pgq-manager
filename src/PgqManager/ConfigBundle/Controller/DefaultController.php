@@ -2,67 +2,86 @@
 
 namespace PgqManager\ConfigBundle\Controller;
 
+use Braincrafted\Bundle\BootstrapBundle\Session\FlashMessage;
+use Doctrine\Common\Collections\ArrayCollection;
+use PgqManager\ConfigBundle\Entity\Database;
 use PgqManager\ConfigBundle\Entity\Settings;
 use PgqManager\ConfigBundle\Form\Type\SettingsType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Exception\DumpException;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Parser;
 
 class DefaultController extends Controller
 {
     public function indexAction(Request $request)
     {
         $new = false;
-        $originalDb = array();
 
-        $settings = $this->getDoctrine()->getRepository('ConfigBundle:Settings')->findOneBy(array(
-            'uid' => $this->get('security.context')->getToken()->getUsername()
-        ));
+        $originalDb = $this->loadFromConfig(); //$this->getDoctrine()->getRepository('ConfigBundle:Database')->findAll;
 
-        if (!$settings) {
-            $settings = new Settings();
-            $new = true;
-        } else {
-            foreach ($settings->getDatabases() as $db) $originalDb[] = $db;
-        }
+        $settings = new Settings();
+        $settings->setDatabases($originalDb);
 
         $form = $this->createForm(new SettingsType(), $settings);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-
-            $em = $this->getDoctrine()->getManager();
-
-            $settings->setUid($this->get('security.context')->getToken()->getUsername());
-
-            // filtre $originalTags pour ne contenir que les tags
-            // n'étant plus présents
-            foreach ($settings->getDatabases() as $db) {
-                foreach ($originalDb as $key => $toDel) {
-                    if ($toDel->getId() === $db->getId()) {
-                        unset($originalDb[$key]);
-                    }
-                }
+            $iter = 0;
+            foreach($settings->getDatabases() as $database) {
+                $database->setId($iter++);
             }
-
-            // supprime la relation entre le tag et la « Task »
-            foreach ($originalDb as $db) {
-                $db->setSettings(null);
-
-                $em->persist($db);
-
-                // si vous souhaitiez supprimer totalement le Tag, vous pourriez
-                // aussi faire comme cela
-                $em->remove($db);
-            }
-
-            $em->persist($settings);
-
-            $em->flush();
+            $this->saveConfig($settings);
+            $flash = $this->get('braincrafted_bootstrap.flash');
+            $flash->success('Modifications applied');
         }
 
         return $this->render('ConfigBundle:Default:index.html.twig', array(
             'form' => $form->createView()
         ));
+    }
+
+    private function loadFromConfig()
+    {
+        $dbmanager = $this->get('pgq_config_bundle.db_manager');
+        $result = new ArrayCollection();
+
+        try {
+            if ($dbmanager->hasDatabases()) {
+                $result = $dbmanager->getDatabases();
+            }
+
+        } catch (ParseException $e) {
+            $flash = $this->get('braincrafted_bootstrap.flash');
+            $flash->error(sprintf("Unable to parse the YAML string: %s", $e->getMessage()));
+        }
+        return $result;
+    }
+
+    private function saveConfig(Settings $settings)
+    {
+        $yaml = new Dumper();
+
+        try {
+            $content = $yaml->dump($settings->toArray(), 2);
+            $dir = realpath(__DIR__ . '/../Resources/config');
+
+            if (is_writable($dir)) {
+                file_put_contents($dir . '/databases.yml', $content);
+            } else {
+                throw new \Exception(sprintf('File "%s" is not writable.', $dir));
+            }
+
+        } catch (DumpException $e) {
+            $flash = $this->get('braincrafted_bootstrap.flash');
+            $flash->error(sprintf("Unable to dump the array to YAML format : %s", $e->getMessage()));
+
+        } catch (\Exception $e) {
+            $flash = $this->get('braincrafted_bootstrap.flash');
+            $flash->error($e->getMessage());
+        }
     }
 }
