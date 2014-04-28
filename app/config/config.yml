@@ -1,6 +1,6 @@
 imports:
     - { resource: "@AuthenticationBundle/Resources/config/parameters.yml" }
-    - { resource: parameters.yml }
+#    - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: "@DapsLdapBundle/Resources/config/services.yml"}
     - { resource: "@ConfigBundle/Resources/config/parameters.yml" }

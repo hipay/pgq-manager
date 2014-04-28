@@ -7,6 +7,6 @@ services:
 #        arguments: [@service_id, "plain_value", %parameter%]
     main.twig.globalExtension:
         class: PgqManager\MainBundle\Twig\Extension\GlobalExtension
-        arguments: [@doctrine.orm.entity_manager, @security.context]
+        arguments: [@pgq_config_bundle.db_manager, @security.context]
         tags:
             - { name: twig.extension }

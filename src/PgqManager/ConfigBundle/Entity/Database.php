@@ -8,13 +8,15 @@
 namespace PgqManager\ConfigBundle\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use \PgqManager\ConfigBundle\Validator\Constraints\DBAL;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class Database
  *
  * @ORM\Entity(repositoryClass="PgqManager\ConfigBundle\Repository\DatabaseRepository")
- * @ORM\Table(name="pgqm_database")
+ * @ORM\Table(name="fscommon.pgqm_database")
+ * @DBAL
  * @package PgqManager\ConfigBundle\Entity
  */
 class Database
@@ -99,7 +101,7 @@ class Database
      * @ORM\ManyToOne(targetEntity="Settings", inversedBy="databases")
      * @ORM\JoinColumn(name="settings_id", referencedColumnName="id")
      */
-    protected $settings;
+    //protected $settings;
 
     /**
      * @param string $displayName
@@ -254,9 +256,18 @@ class Database
         }
     }
 
-    public function to_Array()
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function toArray()
     {
         return array(
+            'id'           => $this->getId(),
             'display_name' => $this->getDisplayName(),
             'driver'       => $this->getDriver(),
             'host'         => $this->getHost(),

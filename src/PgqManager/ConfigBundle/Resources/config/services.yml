@@ -1,6 +1,5 @@
 parameters:
 #    config.example.class: PgqManager\ConfigBundle\Example
-      pgq_config_bundle.configurator.class: PgqManager\ConfigBundle\Configurator\Configurator
 
 services:
 #    config.example:
@@ -10,12 +9,17 @@ services:
           class: PgqManager\ConfigBundle\Listener\ConfigRouteListener
           tags:
               - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
-          arguments: [ @security.context, @doctrine.orm.entity_manager, @router ]
+          arguments: [ @security.context, @pgq_config_bundle.db_manager, @router ]
 
-      pgq_config_bundle.configurator:
-          class: %pgq_config_bundle.configurator.class%
-          arguments: [ %kernel.cache_dir%]
+      pgq_config_bundle.db_manager:
+          class: PgqManager\ConfigBundle\Service\DatabaseManager
 
       pgq_config_bundle.switch_db:
           class: PgqManager\ConfigBundle\Service\SwitchDatabaseConnection
-          arguments: [ @doctrine, @doctrine.dbal.connection_factory, @security.context ]
+          arguments: [ @pgq_config_bundle.db_manager, @doctrine.dbal.connection_factory ]
+
+      pgq_config_bundle.dbal_validator:
+          class: PgqManager\ConfigBundle\Validator\DBALValidator
+          arguments: [ @doctrine.dbal.connection_factory ]
+          tags:
+              - { name: validator.constraint_validator, alias: DBALConnection }

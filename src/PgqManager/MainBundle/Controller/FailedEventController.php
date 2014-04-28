@@ -25,13 +25,14 @@ class FailedEventController extends Controller
     public function indexAction($id = null, $queue = null, $consumer = null, $event = null)
     {
         $switchDbService = $this->container->get('pgq_config_bundle.switch_db');
+        $databaseManager = $this->container->get('pgq_config_bundle.db_manager');
+
         if ($id && !is_numeric($id)) {
-            $id = $switchDbService->getDatabase(array(
-                'name' => $id,
-                'uid'  => $this->get('security.context')->getToken()->getUsername()
+            $databaseManager->getDatabase(array(
+                'name' => $id
             ))->getId();
         }
-        $dbIds = $switchDbService->getAllDatabaseIds($this->get('security.context')->getToken()->getUsername());
+        $dbIds = $databaseManager->getAllDatabaseIds();
         $pgq = new PGQ();
         $consumers = array();
         $queues = array();
@@ -66,7 +67,7 @@ class FailedEventController extends Controller
                 'queue'    => $queue,
                 'consumer' => $consumer
             );
-            if($event) {
+            if ($event) {
                 $result['filter']['event'] = $event;
             }
         }

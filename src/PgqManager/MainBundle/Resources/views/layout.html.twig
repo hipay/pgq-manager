@@ -35,12 +35,6 @@
         </nav>
     </div>
 
-    {% for flashMessage in app.session.flashbag.get('notice') %}
-        <div class="flash-message">
-            <em>Notice</em>: {{ flashMessage }}
-        </div>
-    {% endfor %}
-
     <div class="container-fluid page">
         {% if app.user %}
             <div class="sidebar-left col-md-2">
@@ -67,7 +61,7 @@
                             {% if ConfigDatabases is defined and ConfigDatabases|length > 0 %}
                                 {% for database in ConfigDatabases %}
                                     <li>
-                                        <a href="{{ path('_main_dashboard_filtered', {'id': database.id}) }}">{{ database.displayName }}</a>
+                                        <a href="{{ path('_main_dashboard_filtered', {'id': loop.index0}) }}">{{ database.displayName }}</a>
                                     </li>
                                 {% endfor %}
                             {% else %}
@@ -84,7 +78,7 @@
                             {% if ConfigDatabases is defined and ConfigDatabases|length > 0 %}
                                 {% for database in ConfigDatabases %}
                                     <li>
-                                        <a href="{{ path('_main_failedevent_list', {'id': database.id}) }}">{{ database.displayName }}</a>
+                                        <a href="{{ path('_main_failedevent_list', {'id': loop.index0}) }}">{{ database.displayName }}</a>
                                     </li>
                                 {% endfor %}
                             {% else %}
@@ -102,9 +96,9 @@
         {% endif %}
 
         <div class="{{ app.user ? 'main-content col-md-12' : 'col-md-12' }}" style>
-            <div name="flashmessage" class="" style="display:none;">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-            </div>
+
+            {% include 'BraincraftedBootstrapBundle::flash.html.twig' with { 'close': true } %}
+
             {% block content %}{% endblock %}
         </div>
 

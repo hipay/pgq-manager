@@ -6,6 +6,7 @@ namespace PgqManager\MainBundle\Twig\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use PgqManager\ConfigBundle\Entity\Database;
+use PgqManager\ConfigBundle\Service\DatabaseManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -14,26 +15,13 @@ class GlobalExtension extends \Twig_Extension
 {
     protected $databases;
 
-    protected $em;
+    protected $dm;
 
-    public function __construct(EntityManager $em, SecurityContext $context)
+    public function __construct(DatabaseManager $dm, SecurityContext $context)
     {
-        $databases = new ArrayCollection();
-        $settings = null;
+        $this->databases = $dm->getDatabases();
 
-        if ($context->getToken()) {
-            $settings = $em->getRepository('ConfigBundle:Settings')->findOneBy(array(
-                'uid' => $context->getToken()->getUsername()
-            ));
-        }
-
-        if ($settings) {
-            $databases = $settings->getDatabases();
-        }
-
-        $this->databases = $databases;
-
-        $this->em = $em;
+        $this->dm = $dm;
     }
 
     public function getGlobals()
@@ -53,13 +41,12 @@ class GlobalExtension extends \Twig_Extension
 
     public function databaseInfos($id)
     {
+        if (is_numeric($id)) {
+            return $this->databases[$id];
+        }
+
         foreach ($this->databases as $database) {
-
             if (!is_numeric($id) && $database->getName() == $id) {
-                return $database;
-            }
-
-            if ($database->getId() == $id) {
                 return $database;
             }
         }

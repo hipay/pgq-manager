@@ -8,7 +8,6 @@
 namespace PgqManager\ConfigBundle\Entity;
 
 
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
@@ -73,11 +72,11 @@ class Settings
     }
 
 
-    public function to_Array()
+    public function toArray()
     {
         $result = array();
         foreach ($this->databases as $database) {
-            $result['databases'][] = $database->to_Array();
+            $result['databases'][] = $database->toArray();
         }
         return $result;
     }
@@ -128,5 +127,15 @@ class Settings
     public function getDatabases()
     {
         return $this->databases;
+    }
+
+    /**
+     * Set databases
+     *
+     * @param Database[]
+     */
+    public function setDatabases(ArrayCollection $dbs)
+    {
+        $this->databases = $dbs;
     }
 }
