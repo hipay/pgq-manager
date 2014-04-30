@@ -14,7 +14,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('bundles/main/js/jquery.datatables.js') }}"></script>
+    <script src="{{ asset('js/jquery.datatables.js') }}"></script>
     <script src="{{ asset('bundles/main/js/main.js') }}"></script>
     <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
     <script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
@@ -62,6 +62,23 @@
                                 {% for database in ConfigDatabases %}
                                     <li>
                                         <a href="{{ path('_main_dashboard_filtered', {'id': loop.index0}) }}">{{ database.displayName }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li>{% trans %}No database configured{% endtrans %}</li>
+                            {% endif %}
+                        </ul>
+                        <li>
+                            <a >{% trans %}Queues{% endtrans %}</a>
+                            <a class="pull-right" data-toggle="collapse" href="#queue-nav">
+                                <i class="glyphicon glyphicon-chevron-down"></i>
+                            </a>
+                        </li>
+                        <ul id="queue-nav" class="collapse sub-menu{% if app.request.attributes.get('_route') in ['_main_queue_list', '_main_queue_list_filtered'] %} in{% endif %}">
+                            {% if ConfigDatabases is defined and ConfigDatabases|length > 0 %}
+                                {% for database in ConfigDatabases %}
+                                    <li>
+                                        <a href="{{ path('_main_queue_list', {'id': loop.index0}) }}">{{ database.displayName }}</a>
                                     </li>
                                 {% endfor %}
                             {% else %}

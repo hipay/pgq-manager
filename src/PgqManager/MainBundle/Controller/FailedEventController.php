@@ -19,7 +19,12 @@ class FailedEventController extends Controller
 {
     /**
      * @Template()
-     * @param int $id
+     *
+     * @param null $id
+     * @param null $queue
+     * @param null $consumer
+     * @param null $event
+     *
      * @return array
      */
     public function indexAction($id = null, $queue = null, $consumer = null, $event = null)
@@ -164,7 +169,7 @@ class FailedEventController extends Controller
             $pgq->init($dbal, $this->getDoctrine()->getManager());
             try {
 
-                if (in_array($this->get('request')->get('action'), array('edit'))) {
+                if (in_array($this->get('request')->get('action'), array())) {
                     throw new \Exception('Action ' . strtoupper($this->get('request')->get('action')) . ' not implemented yet');
                 }
 
@@ -174,10 +179,11 @@ class FailedEventController extends Controller
                 }
                 $dbal->beginTransaction();
 
-                $pgq->$method(
+                $result = $pgq->$method(
                     $this->get('request')->get('queue'),
                     $this->get('request')->get('consumer'),
-                    $this->get('request')->get('event')
+                    $this->get('request')->get('event'),
+                    $this->get('request')->get('data', null)
                 );
 
                 $dbal->commit();
@@ -186,6 +192,11 @@ class FailedEventController extends Controller
                     'Action ' . $this->get('request')->get('action')
                     . ' for event ' . $this->get('request')->get('event')
                     . ' successfully executed';
+
+                if ($this->get('request')->get('action') == 'edit') {
+                    $message .= ' --- New event : ' . $result;
+                }
+
                 $class = 'success';
 
             } catch (DBALException $e) {

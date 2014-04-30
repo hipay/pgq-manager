@@ -20,6 +20,10 @@ _main_failedevent_list:
     pattern: /failed-event/database/{id}/{queue}/{consumer}/{event}
     defaults: { _controller: MainBundle:FailedEvent:index, id: null, queue: null, consumer: null, event: null}
 
+_main_queue_list:
+    pattern: /queue/database/{id}/
+    defaults: { _controller: MainBundle:Queue:index }
+
 _main_default_queueinfo:
     pattern: /queue-info
     defaults: { _controller: MainBundle:Default:queueInfo }
