@@ -14,6 +14,10 @@ namespace PgqManager\MainBundle\Entity;
 class Queue
 {
     /**
+     * @var int
+     */
+    private $queueId;
+    /**
      * @var string
      */
     private $queueName;
@@ -52,7 +56,39 @@ class Queue
     /**
      * @var string
      */
-    private $tickerLag;
+    private $queueDataPfx;
+    /**
+     * @var string
+     */
+    private $queueEventSeq;
+    /**
+     * @var string
+     */
+    private $queueTickSeq;
+
+    private $queueFailedCount;
+
+    private $queueRetryCount;
+
+    private $queueCount;
+
+    private $consumers;
+
+    /**
+     * @param mixed $queueId
+     */
+    public function setQueueId($queueId)
+    {
+        $this->queueId = $queueId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQueueId()
+    {
+        return $this->queueId;
+    }
 
     /**
      * @param int $queueCurTable
@@ -199,19 +235,115 @@ class Queue
     }
 
     /**
-     * @param string $tickerLag
+     * @param string $queueDataPfx
      */
-    public function setTickerLag($tickerLag)
+    public function setQueueDataPfx($queueDataPfx)
     {
-        $this->tickerLag = $tickerLag;
+        $this->queueDataPfx = $queueDataPfx;
     }
 
     /**
      * @return string
      */
-    public function getTickerLag()
+    public function getQueueDataPfx()
     {
-        return $this->tickerLag;
+        return $this->queueDataPfx;
+    }
+
+    /**
+     * @param string $queueEventSeq
+     */
+    public function setQueueEventSeq($queueEventSeq)
+    {
+        $this->queueEventSeq = $queueEventSeq;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueueEventSeq()
+    {
+        return $this->queueEventSeq;
+    }
+
+    /**
+     * @param string $queueTickSeq
+     */
+    public function setQueueTickSeq($queueTickSeq)
+    {
+        $this->queueTickSeq = $queueTickSeq;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueueTickSeq()
+    {
+        return $this->queueTickSeq;
+    }
+
+    /**
+     * @param mixed $queueFailedCount
+     */
+    public function setQueueFailedCount($queueFailedCount)
+    {
+        $this->queueFailedCount = $queueFailedCount;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQueueFailedCount()
+    {
+        return $this->queueFailedCount;
+    }
+
+    /**
+     * @param mixed $queueRetryCount
+     */
+    public function setQueueRetryCount($queueRetryCount)
+    {
+        $this->queueRetryCount = $queueRetryCount;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQueueRetryCount()
+    {
+        return $this->queueRetryCount;
+    }
+
+    /**
+     * @param mixed $queueCount
+     */
+    public function setQueueCount($queueCount)
+    {
+        $this->queueCount = $queueCount;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQueueCount()
+    {
+        return $this->queueCount;
+    }
+
+    /**
+     * @param mixed $consumers
+     */
+    public function setConsumers($consumers)
+    {
+        $this->consumers = $consumers;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConsumers()
+    {
+        return $this->consumers;
     }
 
     /**
@@ -220,6 +352,7 @@ class Queue
      */
     public function populate(array $array)
     {
+        $this->queueId = $array['queue_id'];
         $this->queueName = $array['queue_name'];
         $this->queueNtables = (int)$array['queue_ntables'];
         $this->queueCurTable = (int)$array['queue_cur_table'];
@@ -229,7 +362,9 @@ class Queue
         $this->queueTickerMaxCount = (int)$array['queue_ticker_max_count'];
         $this->queueTickerMaxLag = $array['queue_ticker_max_lag'];
         $this->queueTickerIdlePeriod = $array['queue_ticker_idle_period'];
-        $this->tickerLag = $array['ticker_lag'];
+        $this->queueDataPfx = $array['queue_data_pfx'];
+        $this->queueEventSeq = $array['queue_event_seq'];
+        $this->queueTickSeq = $array['queue_tick_seq'];
 
         return $this;
     }

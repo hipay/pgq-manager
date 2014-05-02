@@ -112,14 +112,20 @@ class PGQ
      */
     public function getQueueInfo($qname = null)
     {
-        $sql = 'select * from pgq . get_queue_info(' . ($qname ? "'" . $qname . "'" : '') . ')';
+        $sql = 'select *'
+            . ' from pgq.queue' . ($qname ? " WHERE queue_name = '" . $qname . "'" : '');
         $return = array();
 
         $result = $this->dbal->executeQuery($sql)->fetchAll();
 
         foreach ($result as $row) {
             $queue = new Queue();
-            $return[] = $queue->populate($row);
+            $queue->populate($row);
+            $queue->setQueueRetryCount($this->get_retry_event_count($queue));
+            $queue->setQueueFailedCount($this->get_failed_event_count($queue));
+            $queue->setQueueCount($this->get_event_count($queue));
+            $queue->setConsumers($this->getConsumerInfo($queue->getQueueName()));
+            $return[] = $queue;
         }
 
         return $return;
@@ -258,5 +264,54 @@ class PGQ
         }
 
         throw new NonUniqueResultException('No event found or too many');
+    }
+
+
+    public function get_failed_event_count(Queue $queue)
+    {
+        $sql =
+            'SELECT'
+            . ' count(fq.*) as count'
+            . ' FROM pgq.failed_queue fq'
+            . ' inner join pgq.subscription s on fq.ev_owner = s.sub_id'
+            . ' inner join pgq.queue q on s.sub_queue = q.queue_id'
+            . ' WHERE q.queue_id = ' . $queue->getQueueId();
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0]['count'];
+    }
+
+    public function get_retry_event_count(Queue $queue)
+    {
+        $sql =
+            'select count(*) as count'
+            . ' from ' . $queue->getQueueDataPfx()
+            . ' where ev_retry is not null';
+
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0]['count'];
+    }
+
+    public function get_event_count(Queue $queue)
+    {
+        $sql =
+            'select count(*) as count'
+            . ' from ' . $queue->getQueueDataPfx();
+
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0]['count'];
+    }
+
+    public function createQueue($qname)
+    {
+        $sql =
+            'select *'
+            . ' from pgq.create_queue(\'' . $qname . '\')';
+
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0];
     }
 }
