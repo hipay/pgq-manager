@@ -1,0 +1,83 @@
+{% extends "MainBundle:Queue:queue.html.twig" %}
+
+
+    {% block subTitle %}
+        {% trans %}Queues{% endtrans %}
+    {% endblock %}
+
+        {% block content_header 'Queues' %}
+
+            {% block content %}
+
+                <div name="table-{{ app.request.get('id') }}" class="row table">
+                    <div class="col-md-12">
+                        <table class="datatable">
+                            <caption
+                                    class="hero-unit{% if failedDatabase.error is defined %} alert-danger{% endif %}">
+                                {{ app.request.get('id')|databaseInfos.displayName }}
+                                {% if failedDatabase.error is defined %}
+                                    <span data-toggle="tooltip" data-placement="top"
+                                          title="{{ app.request.get('id')|databaseInfos.name ~ ' : ' ~ failedDatabase.error }}"
+                                          class="glyphicon glyphicon-info-sign"></span>
+                                {% endif %}
+                            </caption>
+                            <colgroup>
+                                <col style="width: 40%">
+                                <col>
+                                <col>
+                                <col>
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th rowspan="2">{% trans %}Name{% endtrans %}</th>
+                                <th colspan="3">{% trans %}Events{% endtrans %}</th>
+                                <th rowspan="2">{% trans %}Consumers{% endtrans %}</th>
+                            </tr>
+                            <tr>
+                                <th>{% trans %}Failed{% endtrans %}</th>
+                                <th>{% trans %}Retry{% endtrans %}</th>
+                                <th>{% trans %}All{% endtrans %}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for row in queues %}
+
+                                <tr>
+                                    <td>{{ row.queueName }}</td>
+                                    <td>{{ row.queueFailedCount }}</td>
+                                    <td>{{ row.queueRetryCount }}</td>
+                                    <td>{{ row.queueCount }}</td>
+                                    <td>{{ row.consumers|length }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row table">
+                    <div class="col-md-12">
+                        <button class="btn-default" data-toggle="modal" data-target="#modal-new">Add a new queue
+                        </button>
+                    </div>
+                </div>
+
+                <div id="modal-new" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog"
+                     aria-labelledby="newQueueModal" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"
+                                        aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Create a new queue</h4>
+                            </div>
+                            <div class="modal-body">
+                                {{ form(formNewQueue) }}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}

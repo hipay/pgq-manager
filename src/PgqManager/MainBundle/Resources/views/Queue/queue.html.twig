@@ -1,0 +1,12 @@
+{% extends "MainBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% block beforeJavascript %}
+    {% endblock %}
+    <script src="{{ asset('bundles/main/js/queue.js') }}"></script>
+{% endblock %}

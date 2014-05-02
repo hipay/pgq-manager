@@ -9,9 +9,8 @@ namespace PgqManager\MainBundle\Pgq;
 
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\NonUniqueResultException;
 use PgqManager\MainBundle\Entity\Consumer;
 use PgqManager\MainBundle\Entity\Queue;
 
@@ -39,7 +38,7 @@ class PGQ
     /**
      * @param Connection $conn
      */
-    public function  __construct(\Doctrine\DBAL\Connection $conn = null)
+    public function  __construct(Connection $conn = null)
     {
         $this->dbal = $conn;
     }
@@ -102,7 +101,6 @@ class PGQ
         $result['totalCount'] = $this->dbal->executeQuery($sql)->fetchAll();
         $result['totalCount'] = $result['totalCount'][0]['failed_event_count'];
 
-
         return $result;
     }
 
@@ -114,14 +112,20 @@ class PGQ
      */
     public function getQueueInfo($qname = null)
     {
-        $sql = 'select * from pgq . get_queue_info(' . ($qname ? "'" . $qname . "'" : '') . ')';
+        $sql = 'select *'
+            . ' from pgq.queue' . ($qname ? " WHERE queue_name = '" . $qname . "'" : '');
         $return = array();
 
         $result = $this->dbal->executeQuery($sql)->fetchAll();
 
         foreach ($result as $row) {
             $queue = new Queue();
-            $return[] = $queue->populate($row);
+            $queue->populate($row);
+            $queue->setQueueRetryCount($this->get_retry_event_count($queue));
+            $queue->setQueueFailedCount($this->get_failed_event_count($queue));
+            $queue->setQueueCount($this->get_event_count($queue));
+            $queue->setConsumers($this->getConsumerInfo($queue->getQueueName()));
+            $return[] = $queue;
         }
 
         return $return;
@@ -190,10 +194,11 @@ class PGQ
      * @param string $qname
      * @param string $cname
      * @param int $event
+     * @param string $data
      *
      * @return array
      */
-    public function failedEventRetry($qname, $cname, $event)
+    public function failedEventRetry($qname, $cname, $event, $data = null)
     {
         $sql =
             "SELECT * FROM pgq.failed_event_retry("
@@ -210,10 +215,11 @@ class PGQ
      * @param string $qname
      * @param string $cname
      * @param int $event
+     * @param string $data
      *
      * @return array
      */
-    public function failedEventDelete($qname, $cname, $event)
+    public function failedEventDelete($qname, $cname, $event, $data = null)
     {
         $sql =
             "SELECT * FROM pgq.failed_event_delete("
@@ -222,5 +228,90 @@ class PGQ
             . ", " . $event . ")";
 
         return $this->dbal->executeQuery($sql)->fetchAll();
+    }
+
+    /**
+     * @param string $qname
+     * @param string $cname
+     * @param int $event
+     * @param string|null $data
+     * @return int
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function failedEventEdit($qname, $cname, $event, $data = null)
+    {
+        $sql =
+            "select * from pgq.failed_event_list('" . $qname . "','" . $cname . "') where ev_id = " . $event;
+
+        if ($this->dbal->executeQuery($sql)->rowCount() === 1) {
+            $event = $this->dbal->executeQuery($sql)->fetchAll();
+            $event = $event[0];
+            $insert =
+                "select * from pgq.insert_event("
+                . "'" . $qname . "'"
+                . ", '" . $event['ev_type'] . "'"
+                . ", '" . $data . "'"
+                . ", '" . $event['ev_extra1'] . "'"
+                . ", '" . $event['ev_extra2'] . "'"
+                . ", '" . $event['ev_extra3'] . "'"
+                . ", '" . $event['ev_extra4'] . "'"
+                . ")";
+
+            $result = $this->dbal->executeQuery($insert)->fetchAll();
+            $this->failedEventDelete($qname, $cname, $event['ev_id']);
+
+            return $result[0]['insert_event'];
+        }
+
+        throw new NonUniqueResultException('No event found or too many');
+    }
+
+
+    public function get_failed_event_count(Queue $queue)
+    {
+        $sql =
+            'SELECT'
+            . ' count(fq.*) as count'
+            . ' FROM pgq.failed_queue fq'
+            . ' inner join pgq.subscription s on fq.ev_owner = s.sub_id'
+            . ' inner join pgq.queue q on s.sub_queue = q.queue_id'
+            . ' WHERE q.queue_id = ' . $queue->getQueueId();
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0]['count'];
+    }
+
+    public function get_retry_event_count(Queue $queue)
+    {
+        $sql =
+            'select count(*) as count'
+            . ' from ' . $queue->getQueueDataPfx()
+            . ' where ev_retry is not null';
+
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0]['count'];
+    }
+
+    public function get_event_count(Queue $queue)
+    {
+        $sql =
+            'select count(*) as count'
+            . ' from ' . $queue->getQueueDataPfx();
+
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0]['count'];
+    }
+
+    public function createQueue($qname)
+    {
+        $sql =
+            'select *'
+            . ' from pgq.create_queue(\'' . $qname . '\')';
+
+        $result = $this->dbal->executeQuery($sql)->fetchAll();
+
+        return $result[0];
     }
 }

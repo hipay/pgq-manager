@@ -3,6 +3,21 @@
  */
 $(document).ready(function () {
 
+  var toInput = function (obj) {
+    var html = '';
+    $.each(obj, function (index, value) {
+      html +=
+        '<div class="form-group">'
+          + '<label class="control-label col-md-6" for="form_text">' + index + '</label>'
+          + '<div class="col-md-6">'
+          + '<input type="text" id="form_text" name="' + index + "\" class=\"form-control\" value='" + value + "'>"
+          + '</div>'
+          + '</div>';
+    });
+
+    return html;
+  };
+
   var options = [];
 
   var parseQueryString = function (queryString) {
@@ -14,21 +29,27 @@ $(document).ready(function () {
     // Convert the array of strings into an object
     for (i = 0, l = queries.length; i < l; i++) {
       temp = queries[i].split('=');
-      params[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1]);
+      params[decodeURIComponent(temp[0])] = (temp[1] ? decodeURIComponent(temp[1].replace(/\+/g, '%20')) : '');
     }
 
     return params;
   };
-
   var flashmessage = function (sMessage, sClass) {
 
     var div = $('<div class="row table alert alert-' + sClass + '">'
       + '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'
       + '<strong>' + sClass.toUpperCase() + '!</strong> ' + sMessage
       + '</div>');
-    $(div).prependTo('div.main-content').delay(2000).fadeOut(400, function () {
-      $(this).remove()
-    });
+
+    $(div).prependTo('div.main-content').delay(2000)
+      .queue(function (next) {
+        if (!$(div).hasClass('alert-error')) {
+          $(div).fadeOut(400, function () {
+            $(this).remove();
+          })
+        }
+        next();
+      });
   };
 
   function fnFormatDetails(nTr) {
@@ -41,6 +62,29 @@ $(document).ready(function () {
 
     return sOut;
   }
+
+  var eventAction = function (evId, action, data) {
+    customSearchData.splice(3, Number.MAX_VALUE);
+    customSearchData.push({name: 'event', value: evId});
+    customSearchData.push({name: 'action', value: action});
+
+    if (data != null) {
+      customSearchData.push({name: 'data', value: data});
+    }
+
+    $.ajax({
+      url: Routing.generate('_main_failedevent_action'),
+      type: 'POST',
+      dataType: 'json',
+      data: customSearchData,
+      success: function (json) {
+        if (json.flashmessage) {
+          flashmessage(json.flashmessage.message, json.flashmessage.class);
+        }
+        datatable.fnPageChange(0);
+      }
+    });
+  };
 
   var datatable = $('table.ajax.datatable').dataTable({
     "bProcessing": true,
@@ -119,27 +163,31 @@ $(document).ready(function () {
     })
     .on('click', 'a.table-event-action', function (e) {
       e.stopPropagation();
-      customSearchData.splice(3, Number.MAX_VALUE);
-      customSearchData.push({name: 'event', value: $(this).parents('tr').find('td').eq(0).text()});
-      customSearchData.push({name: 'action', value: $(this).data('action')});
+      var $this = $(this);
 
-      $.ajax({
-        url: Routing.generate('_main_failedevent_action'),
-        type: 'POST',
-        dataType: 'json',
-        data: customSearchData,
-        success: function (json) {
-          if (json.flashmessage) {
-            flashmessage(json.flashmessage.message, json.flashmessage.class);
-          }
-          datatable.fnPageChange(0);
-        }
-      });
+      if ($this.data('action') == 'edit') {
+        var tr = $this.parents('tr')[0],
+          data = datatable.fnGetData(tr);
+
+        $('#event-modal div[name=data]').html(toInput(parseQueryString(data.ev_data)));
+
+        $('#event-modal')
+          .modal('show')
+          .on('click', 'button[name=save]', function (e) {
+            eventAction(
+              $this.parents('tr').find('td').eq(0).text(),
+              $this.data('action'),
+              $('#event-modal form').serialize()
+            );
+            $('#event-modal').modal('hide');
+          });
+
+        return false;
+      }
+
+      eventAction($this.parents('tr').find('td').eq(0).text(), $this.data('action'), null);
 
       return false;
-    })
-    .on('mouseenter', 'tr[name=data]', function (e) {
-        console.log(parseQueryString($(this).text()));
     });
 
   $('.datatable-action').on('click', function () {
@@ -177,4 +225,5 @@ $(document).ready(function () {
     datatable.fnFilter(eventFilter);
   }
 
-});
+})
+;
