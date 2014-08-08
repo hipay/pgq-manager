@@ -12,6 +12,9 @@ A PHP based web application in order to manage PGQ Skytools 2.x [here](http://wi
 ## Change log
 See [CHANGELOG](CHANGELOG.md) file for details.
 
+## Depedencies
+ * nodejs : compile less files to css
+
 ## Contributions
 All suggestions for improvement or direct contributions are very welcome.
 Please report bugs or ask questions using the [Issue Tracker](https://github.com/Hi-Media/****/issues).
