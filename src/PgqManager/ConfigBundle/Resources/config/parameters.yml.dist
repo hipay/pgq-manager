@@ -1,5 +1,5 @@
 parameters:
-    database_driver:   pdo_postgresql
+    database_driver:   pdo_pgsql
     database_host:     null
     database_port:     null
     database_name:     null
