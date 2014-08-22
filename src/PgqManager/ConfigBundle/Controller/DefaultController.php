@@ -1,10 +1,27 @@
 <?php
+/**
+ * Copyright (c) 2014 HiMedia Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @copyright 2014 HiMedia Group
+ * @author Karl MARQUES <kmarques@hi-media.com>
+ * @license Apache License, Version 2.0
+ */
 
 namespace PgqManager\ConfigBundle\Controller;
 
-use Braincrafted\Bundle\BootstrapBundle\Session\FlashMessage;
 use Doctrine\Common\Collections\ArrayCollection;
-use PgqManager\ConfigBundle\Entity\Database;
 use PgqManager\ConfigBundle\Entity\Settings;
 use PgqManager\ConfigBundle\Form\Type\SettingsType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -12,14 +29,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Exception\DumpException;
 use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Parser;
 
 class DefaultController extends Controller
 {
     public function indexAction(Request $request)
     {
-        $new = false;
-
         $originalDb = $this->loadFromConfig(); //$this->getDoctrine()->getRepository('ConfigBundle:Database')->findAll;
 
         $settings = new Settings();
