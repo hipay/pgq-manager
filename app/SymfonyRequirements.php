@@ -683,5 +683,23 @@ class SymfonyRequirements extends RequirementCollection
                 'Install <strong>PDO drivers</strong> (mandatory for Doctrine).'
             );
         }
+
+        exec("which /usr/bin/nodejs", $temp, $nodeIsPresent);
+        $this->addRequirement(
+            $nodeIsPresent == 0,
+            'NodeJS should be installed',
+            'Install <strong>NodeJS</strong> (mandatory for Assetic).'
+        );
+
+        if ($nodeIsPresent){
+            exec("npm list -g | grep less", $temp, $lessIsPresent);
+        } else{
+            $lessIsPresent = 0;
+        }
+        $this->addRequirement(
+            $lessIsPresent == 0,
+            'npm Lessc package should be installed',
+            'Install <strong>Lessc (npm module)</strong> (mandatory for Assetic).'
+        );
     }
 }
