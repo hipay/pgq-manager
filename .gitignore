@@ -6,6 +6,7 @@
 /app/cache/*
 /app/config/parameters.yml
 /src/PgqManager/AuthenticationBundle/Resources/config/parameters.yml
+/src/PgqManager/ConfigBundle/Resources/config/parameters.yml
 /app/logs/*
 !app/cache/.gitkeep
 !app/logs/.gitkeep
