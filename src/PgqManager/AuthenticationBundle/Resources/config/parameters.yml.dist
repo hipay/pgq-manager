@@ -17,11 +17,11 @@
 # @license Apache License, Version 2.0
 
 parameters:
-    daps_ldap.ldap.admin.dn: cn=ldap-infos,ou=users,dc=hi-media,dc=com
-    daps_ldap.ldap.admin.password: 8abkutKS
+    daps_ldap.ldap.admin.dn: ~
+    daps_ldap.ldap.admin.password: ~
     daps_ldap.ldap.admin.enable: false
     daps_ldap.ldap.srv: False # or example.com to use srv records
-    daps_ldap.ldap.host: ldap://annuaire.hi-media-techno.com
-    daps_ldap.ldap.port: 389
+    daps_ldap.ldap.host: ~
+    daps_ldap.ldap.port: ~
     daps_ldap.ldap.dn: uid
-    daps_ldap.ldap.username_suffix: ou=users,dc=hi-media,dc=com
+    daps_ldap.ldap.username_suffix: ~

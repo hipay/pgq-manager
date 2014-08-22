@@ -5,6 +5,7 @@
 /app/bootstrap.php.cache
 /app/cache/*
 /app/config/parameters.yml
+/src/PgqManager/AuthenticationBundle/Resources/config/parameters.yml
 /app/logs/*
 !app/cache/.gitkeep
 !app/logs/.gitkeep
@@ -12,6 +13,7 @@
 /vendor/
 /bin/
 /composer.phar
+/composer.lock
 .idea
 .twgit*
 .DS_Store

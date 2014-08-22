@@ -27,7 +27,7 @@
     "daps/ldap-bundle": "*@dev",
     "braincrafted/bootstrap-bundle": "dev-develop",
     "twbs/bootstrap": "3.0.*",
-    "jquery/jquery": "1.10.*",
+    "jquery/jquery": "1.11.1",
     "friendsofsymfony/jsrouting-bundle": "dev-master"
   },
   "scripts": {
@@ -38,7 +38,8 @@
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
       "Braincrafted\\Bundle\\BootstrapBundle\\Composer\\ScriptHandler::install",
-      "php app/console assets:install"
+      "php app/console assets:install",
+      "php app/console assetic:dump"
     ],
     "post-update-cmd": [
       "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
@@ -47,7 +48,8 @@
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
       "Braincrafted\\Bundle\\BootstrapBundle\\Composer\\ScriptHandler::install",
-      "php app/console assets:install"
+      "php app/console assets:install",
+      "php app/console assetic:dump"
     ]
   },
   "config": {
@@ -56,9 +58,15 @@
   "extra": {
     "symfony-app-dir": "app",
     "symfony-web-dir": "web",
-    "incenteev-parameters": {
-      "file": "app/config/parameters.yml"
-    },
+    "incenteev-parameters": [
+      {
+        "file": "app/config/parameters.yml"
+      },
+      {
+        "file": "src/PgqManager/AuthenticationBundle/Resources/config/parameters.yml",
+        "dist-file": "src/PgqManager/AuthenticationBundle/Resources/config/parameters.yml.dist"
+      }
+    ],
     "branch-alias": {
       "dev-master": "2.4-dev"
     }
@@ -68,9 +76,9 @@
       "type": "package",
       "package": {
         "name": "jquery/jquery",
-        "version": "1.10.2",
+        "version": "1.11.1",
         "dist": {
-          "url": "http://code.jquery.com/jquery-1.10.2.js",
+          "url": "http://code.jquery.com/jquery-1.11.1.js",
           "type": "file"
         }
       }
