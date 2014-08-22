@@ -60,7 +60,8 @@
     "symfony-web-dir": "web",
     "incenteev-parameters": [
       {
-        "file": "app/config/parameters.yml"
+        "file": "src/PgqManager/ConfigBundle/Resources/config/parameters.yml",
+        "dist-file": "src/PgqManager/ConfigBundle/Resources/config/parameters.yml.dist"
       },
       {
         "file": "src/PgqManager/AuthenticationBundle/Resources/config/parameters.yml",
