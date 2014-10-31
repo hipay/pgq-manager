@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Symfony2 :: Release Management" default="start" basedir="." description="Symfony2 deployment">
+    <target name="start" description="Start Release">
+        <echo message="Deployment console"/>
+        <echo message="**************************"/>
+        <echo message="Commands:"/>
+        <echo message=" start_release"/>
+        <echo message=" update"/>
+        <echo message=" check_properties"/>
+        <echo message="**************************"/>
+    </target>
+
+    <target name="check_properties" description="Check Phing Configuration">
+        <property name="propertyfile" value="app/config/property.properties"/>
+
+        <echo message="---> Checking all Phing properties"/>
+
+        <property file="${propertyfile}"/>
+        <available file="${propertyfile}" property="propertyfilefound" value="true"/>
+        <fail unless="propertyfilefound" message="Missing configuration file (${propertyfile})!"/>
+
+        <!-- Looking for mandatory properties -->
+        <if>
+            <not>
+                <isset property="host.servername"/>
+            </not>
+            <then>
+                <fail message="Missing host.servername property!"/>
+            </then>
+        </if>
+        <if>
+            <not>
+                <isset property="host.deploy_path"/>
+            </not>
+            <then>
+                <fail message="Missing host.deploy_path property!"/>
+            </then>
+        </if>
+
+        <if>
+            <not>
+                <isset property="git.url"/>
+            </not>
+            <then>
+                <fail message="Missing git repository URL property!"/>
+            </then>
+        </if>
+        <!-- Looking for optional properties -->
+        <if>
+            <not>
+                <isset property="git.version"/>
+            </not>
+            <then>
+                <property name="git.version"
+                          value="stable"
+                          override="true"/>
+            </then>
+        </if>
+
+        <if>
+            <not>
+                <isset property="project"/>
+            </not>
+            <then>
+                <property name="project"
+                          value="myproject"
+                          override="true"/>
+            </then>
+        </if>
+
+        <if>
+            <not>
+                <isset property="tmp_dir"/>
+            </not>
+            <then>
+                <property name="tmp_dir"
+                          value="/tmp/${project}/"
+                          override="true"/>
+            </then>
+        </if>
+
+        <if>
+            <not>
+                <isset property="package_name"/>
+            </not>
+            <then>
+                <property name="package_name"
+                          value="${project}_${git.version}.tar"
+                          override="true"/>
+            </then>
+        </if>
+
+        <exec command="php -r 'echo uniqid();'" outputProperty="release"/>
+
+        <echo message="The value of hostname has been set to '${host.servername}'"/>
+        <echo message="The value of deploy path has been set to '${host.deploy_path}'"/>
+        <echo message="The value of git repository URL has been set to '${git.url}'"/>
+        <echo message="The value of Version has been set to '${git.version}'"/>
+        <echo message="The value of project has been set to '${project}'"/>
+        <echo message="The value of temp directory has been set to '${tmp_dir}'"/>
+        <echo message="The value of package name has been set to '${package_name}'"/>
+        <echo message="The value of release has been set to '${release}'"/>
+    </target>
+
+    <target name="start_release" description="Start Release"
+            depends="check_properties, clone_repository, generate_vendors, build_package, push_package">
+
+        <fail message="Test dependances"/>
+
+        <!--<echo message="Refresh release Tag..."/>
+        <phing phingfile="deploy.xml" inheritRefs="true" target="refresh_release_tag"/>-->
+
+        <echo message="Build Package..."/>
+        <phing phingfile="deploy.xml" inheritRefs="true" target="build_package"/>
+
+        <echo message="Sync Package..."/>
+        <phing phingfile="deploy.xml" inheritRefs="true" target="sync_package"/>
+
+    </target>
+
+    <target name="sync_package" description="Check Repository">
+        <foreach list="${host}" param="hostname" target="push_package"/>
+    </target>
+
+    <target name="push_package" description="Push package to server">
+        <!--  /SYNC/ -->
+        <echo message="---> Push package ${package_name} to ${host.servername} "/>
+
+        <echo message="---***> Creating release directory"/>
+        <ssh username="${host.username}"
+             host="${host.servername}"
+             command="mkdir -p ${host.deploy_path}/${project}/releases/${release}"
+                />
+
+        <echo message="---***> Creating transferring package"/>
+        <scp username="${host.username}"
+             host="${host.servername}"
+             todir="${host.deploy_path}/${project}/releases/${release}/"
+             file="${tmp_dir}${package_name}"
+             level="debug"
+                />
+
+        <echo message="---***> Deploying package"/>
+        <ssh username="${host.username}"
+             host="${host.servername}"
+             command="tar xf ${host.deploy_path}/${project}/releases/${release} -C ${host.deploy_path}/${project}/releases/${release}"
+                />
+
+        <ssh username="${host.username}"
+             host="${host.servername}"
+             command="ln -s ${host.deploy_path}/${project}/releases/${release} ${host.deploy_path}/${project}/current"
+                />
+    </target>
+
+    <target name="clone_repository" description="Clone Repository" depends="check_properties">
+        <echo message="---> Cloning Repository"/>
+
+        <delete dir="${tmp_dir}" includeemptydirs="true" quiet="true" verbose="false"/>
+        <mkdir dir="/tmp/${project}/"/>
+        <!-- gitPath="/usr/local/git/bin/git" -->
+        <gitclone
+                repository="${git.url}"
+                targetPath="${tmp_dir}"
+                />
+
+        <gitcheckout
+                repository="${tmp_dir}"
+                branchname="${git.version}"
+                quiet="false"
+                forcecreate="true"
+                force="true"
+                />
+    </target>
+
+    <target name="generate_vendors" description="Generate vendors using composer" depends="clone_repository">
+        <if>
+            <not>
+                <isset property="no-vendors"/>
+            </not>
+            <then>
+
+                <echo message="---> Generating vendors"/>
+
+                <!-- Check wget -->
+                <exec command="which composer" outputProperty="bin.composer" returnProperty="requirement.composer"/>
+                <if>
+                    <equals arg1="${requirement.composer}" arg2="1"/>
+                    <then>
+                        <echo message="---***> Composer not found. Downloading it"/>
+                        <exec
+                                command="php -r &quot;readfile('https://getcomposer.org/installer');&quot; | php"
+                                dir="${tmp_dir}"
+                                checkreturn="true"/>
+                        <property name="bin.composer" value="php composer.phar"/>
+                    </then>
+                </if>
+
+                <echo message="---***> Composer found. Generating"/>
+                <exec
+                        command="${bin.composer} install --no-dev --verbose --prefer-dist --optimize-autoloader --no-progress"
+                        dir="${tmp_dir}"
+                        checkreturn="true" passthru="true"/>
+            </then>
+            <else>
+                <echo message="Option : no-vendors activated"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="build_package" description="Build Package...">
+
+        <tar destfile="${tmp_dir}/${package_name}" basedir="${tmp_dir}" compression="gzip"/>
+
+        <available file="${tmp_dir}/${package_name}" property="packagefilefound" value="true"/>
+        <fail unless="packagefilefound" message="Missing ${tmp_dir} file!"/>
+
+    </target>
+
+    <target name="send_notification" description="send notification">
+        <mail tolist="${mail}" subject="Deploy ${project} complete" from="mail@myproject.com">
+            Deploy Complete
+            -----------------------
+            Deploy Tag: ${version}
+            Modul: ${project}
+            Servers: ${hostnames}
+            -----------------------
+        </mail>
+    </target>
+
+</project>
