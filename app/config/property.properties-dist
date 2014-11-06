@@ -1,0 +1,8 @@
+host.servername=localhost
+host.deploy_path=/tmp
+host.username=kmarques
+git.url=https://github.com/Hi-Media/PGQManager.git
+git.version=stable
+project=PGQManager
+server.user=www-data
+shared-files=app/config/config.yml
